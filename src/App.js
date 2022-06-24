@@ -1,22 +1,19 @@
 import * as React from "react";
-import { Admin, Resource, ListGuesser } from 'react-admin';
-import { List, Datagrid, SingleFieldList, SimpleList } from "react-admin";
+import { Admin, Resource, EditGuesser } from 'react-admin';
+import { List, Datagrid } from "react-admin";
 import { Show, SimpleShowLayout } from "react-admin";
-
-import { ArrayField, TextField, ChipField, RichTextField, ReferenceField, ReferenceArrayField } from "react-admin";
-import { Container, Box, Grid, Paper, Typography, Button } from '@mui/material';
-
-import PersonIcon from '@mui/icons-material/Person';
-import AppShortcutIcon from '@mui/icons-material/AppShortcut';
-
+import {  TextField,  RichTextField } from "react-admin";
+import { Container} from '@mui/material';
 import { fetchUtils } from 'react-admin'
 import radataprovider from "./dataprovider";
 import raauthprovider from "./authProvider";
-
 import { defaultTheme } from 'react-admin';
 import MyLayout from './layout'
-import { AccountList } from "./accounts";
-
+import { AccountList} from "./accounts";
+import { ProfileShow} from "./profile";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import HubIcon from '@mui/icons-material/Hub';
+import { ConnectionList} from "./connections";
 import dashboard from "./dashboard";
 
 function fetchJson(url, options = {}) {
@@ -29,8 +26,8 @@ function fetchJson(url, options = {}) {
   return fetchUtils.fetchJson(url, options)
 }
 
-const dataProvider = radataprovider('http://localhost:9090/console/user', fetchJson);
-const authProvider = raauthprovider('http://localhost:9090/console/user', fetchJson);
+const dataProvider = radataprovider('http://localhost:8080/console/user', fetchJson);
+const authProvider = raauthprovider('http://localhost:8080/console/user', fetchJson);
 
 
 const myTheme = {
@@ -82,36 +79,7 @@ const myTheme = {
 };
 
 
-export const ConnectionList = () => (
-  <List>
-    <SimpleList
-      primaryText={record => record.appName}
-      secondaryText={record => record.realm}
-      tertiaryText={
-        // <ReferenceArrayField source="scopes" reference="scopes">
-        //   <SingleFieldList>
-        //     <TextField source="name" />
-        //   </SingleFieldList>
-        // </ReferenceArrayField>
-        <ArrayField source="scopes">
-          <SimpleList
-            primaryText={record => record.name}
-            secondaryText={record => record.description}
-          />
-        </ArrayField>
-      }
-      leftIcon={record => <AppShortcutIcon />}
-    />
-    {/* <Datagrid>
-        <TextField source="id" />
-        <ReferenceField source="subjectId" reference="subjects"><TextField source="id" /></ReferenceField>
-        <ReferenceField source="clientId" reference="clients"><TextField source="id" /></ReferenceField>
-        <TextField source="realm" />
-        <TextField source="appName" />
-        <ArrayField source="scopes"><SingleFieldList><ChipField source="scope" /></SingleFieldList></ArrayField>
-      </Datagrid> */}
-  </List>
-);
+
 
 export const ScopeList = () => (
   <List>
@@ -119,7 +87,6 @@ export const ScopeList = () => (
       <TextField source="scope" />
       <TextField source="name" />
       <TextField source="description" />
-      {/* <ReferenceField source="resourceId" reference="resources"><TextField source="id" /></ReferenceField> */}
       <TextField source="id" />
     </Datagrid>
   </List>
@@ -139,9 +106,9 @@ export const ScopeShow = () => (
 const App = () => (
   <Container maxWidth="xl">
     <Admin title="AAC" disableTelemetry authProvider={authProvider} dataProvider={dataProvider} theme={myTheme} dashboard={dashboard} layout={MyLayout}>
-      <Resource name="accounts" list={AccountList} />
-      <Resource name="connections" list={ConnectionList} />
-      {/* <Resource name="scopes" list={ScopeList} show={ScopeShow} /> */}
+      <Resource name="accounts" list={AccountList} icon={ManageAccountsIcon}/>
+      <Resource name="connections" list={ConnectionList} icon={HubIcon}/>
+      <Resource name="profile" show={ProfileShow} edit={EditGuesser}/>
 
     </Admin>
   </Container>
