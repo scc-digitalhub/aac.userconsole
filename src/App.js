@@ -16,8 +16,12 @@ import raauthprovider from "./authProvider";
 import { defaultTheme } from 'react-admin';
 import MyLayout from './layout'
 import { AccountList } from "./accounts";
+import {ConnectionList, Row} from "./connections";
 
+import { ProfileList, ProfileShow } from './profile';
 import dashboard from "./dashboard";
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 
 function fetchJson(url, options = {}) {
   if (!options.headers) {
@@ -29,8 +33,8 @@ function fetchJson(url, options = {}) {
   return fetchUtils.fetchJson(url, options)
 }
 
-const dataProvider = radataprovider('http://localhost:9090/console/user', fetchJson);
-const authProvider = raauthprovider('http://localhost:9090/console/user', fetchJson);
+const dataProvider = radataprovider('http://localhost:8080/console/user', fetchJson);
+const authProvider = raauthprovider('http://localhost:8080/console/user', fetchJson);
 
 
 const myTheme = {
@@ -82,37 +86,6 @@ const myTheme = {
 };
 
 
-export const ConnectionList = () => (
-  <List>
-    <SimpleList
-      primaryText={record => record.appName}
-      secondaryText={record => record.realm}
-      tertiaryText={
-        // <ReferenceArrayField source="scopes" reference="scopes">
-        //   <SingleFieldList>
-        //     <TextField source="name" />
-        //   </SingleFieldList>
-        // </ReferenceArrayField>
-        <ArrayField source="scopes">
-          <SimpleList
-            primaryText={record => record.name}
-            secondaryText={record => record.description}
-          />
-        </ArrayField>
-      }
-      leftIcon={record => <AppShortcutIcon />}
-    />
-    {/* <Datagrid>
-        <TextField source="id" />
-        <ReferenceField source="subjectId" reference="subjects"><TextField source="id" /></ReferenceField>
-        <ReferenceField source="clientId" reference="clients"><TextField source="id" /></ReferenceField>
-        <TextField source="realm" />
-        <TextField source="appName" />
-        <ArrayField source="scopes"><SingleFieldList><ChipField source="scope" /></SingleFieldList></ArrayField>
-      </Datagrid> */}
-  </List>
-);
-
 export const ScopeList = () => (
   <List>
     <Datagrid rowClick="show">
@@ -139,10 +112,8 @@ export const ScopeShow = () => (
 const App = () => (
   <Container maxWidth="xl">
     <Admin title="AAC" disableTelemetry authProvider={authProvider} dataProvider={dataProvider} theme={myTheme} dashboard={dashboard} layout={MyLayout}>
-      <Resource name="accounts" list={AccountList} />
-      <Resource name="connections" list={ConnectionList} />
-      {/* <Resource name="scopes" list={ScopeList} show={ScopeShow} /> */}
-
+      <Resource name="accounts" list={AccountList} icon={ManageAccountsOutlinedIcon} />
+      <Resource name="connections" list={ConnectionList} icon={LanOutlinedIcon} />
     </Admin>
   </Container>
 );

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { Box, Grid, Paper, Typography } from '@mui/material';
-import { useCreatePath, NumberField, useListContext, RecordContextProvider } from 'react-admin';
+import { useCreatePath, NumberField, useListContext, RecordContextProvider, ShowButton } from 'react-admin';
 import { Link } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Card, CardContent, CardActions, CardHeader } from '@mui/material';
@@ -24,18 +24,19 @@ export const GridList = (props) => {
     const { title, subtitle, icon, primaryText, secondaryText, actions } = props;
 
     const { data, isLoading, total } = useListContext();
-
+    
     if (isLoading === true) {
         return <LinearProgress />;
     }
 
     if (!data) return null;
-
+    
 
     return (
         <Box>
             <Grid container spacing={2} >
                 {data.map((record, rowIndex) => (
+                    
                     <RecordContextProvider key={record.id} value={record}>
 
                         <Grid item xs={12} md={cols} zeroMinWidth >
@@ -49,6 +50,7 @@ export const GridList = (props) => {
                                     >
 
                                     </CardHeader>)
+                                    
                                 }
                                 <CardContent>
                                     {isValidElement(primaryText)
@@ -61,12 +63,15 @@ export const GridList = (props) => {
                                         {isValidElement(actions)
                                             ? actions
                                             : actions(record, record.id)}
+                                           
                                     </CardActions>
                                 )}
+                                
                             </Card>
                         </Grid>
+                        
                     </RecordContextProvider>
-
+                    
                 ))}
             </Grid >
         </Box >

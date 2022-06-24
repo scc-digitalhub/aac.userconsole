@@ -1,19 +1,37 @@
 import * as React from "react";
-import { Title } from 'react-admin';
-import { useGetIdentity, useGetOne } from 'react-admin';
+import { useGetIdentity } from 'react-admin';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Card, CardContent, CardActions, CardHeader } from '@mui/material';
-import { Container, Box, Grid, Paper, Typography, Button, Avatar } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import AppShortcutIcon from '@mui/icons-material/AppShortcut';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import DevicesIcon from '@mui/icons-material/Devices';
+import { Container, Box, Grid, Typography, Button, Avatar } from '@mui/material';
+
+import { ProfileShow } from './profile';
+import { AccountsListDashBoard } from "./accounts";
+import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+
+
+
+function MillisecondsToDate(props) {
+    const date = new Date(props);
+    return date.toLocaleString('en-GB');
+}
+function BooleanToString(props) {
+    return props.toString();
+}
 
 const Dashboard = () => {
     const { identity, isLoading } = useGetIdentity();
     if (isLoading === true) {
         return <LinearProgress />;
     }
+
+    let profile = false;
+    if (identity && !isLoading) {
+        profile = identity.identities.find((item) => (item.authority === "internal"));
+    }
+
+
 
     return (
         <Container maxWidth="lg">
@@ -29,77 +47,95 @@ const Dashboard = () => {
                 Manage you personal information, accounts and review your security settings.
             </Typography>
 
+
+
+
+
+
+
             <Grid container spacing={2} >
-                <Grid item xs={12} md={6} zeroMinWidth >
-                    <Card sx={{ height: '100%' }}>
-                        <CardHeader
-                            title="Accounts"
-                            avatar={<AccountBoxIcon color="primary-dark" />}
-                            titleTypographyProps={{ variant: 'h6' }} />
-                        <CardContent>
-                            Review and manage your accounts
-                        </CardContent>
-                        <CardActions>
-                            <Button variant="contained" >Manage Accounts</Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
+
 
                 <Grid item xs={12} md={6} zeroMinWidth >
                     <Card sx={{ height: '100%' }}>
                         <CardHeader
                             title="Profile"
-                            avatar={<Avatar sx={{ bgcolor: 'red' }}><PersonIcon /></Avatar>}
+
+                            avatar={<Avatar sx={{ bgcolor: 'darkorange' }}><BadgeOutlinedIcon /></Avatar>}
                             titleTypographyProps={{ variant: 'h6' }} />
                         <CardContent>
-                            View and update your personal information
+                            <Typography variant="h6" gutterBottom sx={{ pt: 2, pb: 2, textAlign: 'left', fontWeight: "bold" }} >
+                                {identity.subjectId}
+                            </Typography >
+                            <Typography variant="h6" gutterBottom sx={{ pt: 2, pb: 2, textAlign: 'left' }} >
+                                Le tue informazioni personali come dalla registrazione
+                            </Typography>
+                            <ProfileShow />
                         </CardContent>
                         <CardActions>
-                            <Button >Edit profile</Button>
+                            <Button variant="outlined" color="error">Delete Profile</Button>
+
                         </CardActions>
                     </Card>
                 </Grid>
+
 
                 <Grid item xs={12} md={6} zeroMinWidth >
                     <Card sx={{ height: '100%' }}>
                         <CardHeader
-                            title="Devices"
-                            avatar={<Avatar variant="square"><DevicesIcon /></Avatar>}
+                            title="Account Internal"
+                            avatar={<Avatar sx={{ bgcolor: 'darkviolet' }}><SupervisorAccountOutlinedIcon /></Avatar>}
                             titleTypographyProps={{ variant: 'h6' }} />
-                        <CardContent>
-                            You have currently active sessions on one or more devices.
-                        </CardContent>
-                        <CardActions>
-                            <Button size="small">View sessions</Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                        <CardContent >
+                            {profile && <Box>
+                                <Typography variant="button" component="div" gutterBottom>
+                                    <h5>Email:</h5>
+                                    {profile.account.email}
+                                </Typography>
+                                <Typography variant="button" component="div" gutterBottom>
+                                    <h5>Username:</h5>
+                                    {profile.account.username}
+                                </Typography>
+                                <Typography variant="button" component="div" gutterBottom>
+                                    <h5>Name:</h5>
+                                    {profile.account.name}
+                                </Typography>
+                                <Typography variant="button" component="div" gutterBottom>
+                                    <h5>Surname:</h5>
+                                    {profile.account.surname}
+                                </Typography>
+                                <Typography variant="button" component="div" gutterBottom>
+                                    <h5>DAte:</h5>
+                                    {MillisecondsToDate(profile.account.createDate)}
+                                </Typography></Box>}
 
-                <Grid item xs={12} md={6} zeroMinWidth >
-                    <Card sx={{ height: '100%' }}>
-                        <CardHeader
-                            title="Connections"
-                            avatar={<Avatar sx={{ width: 56, height: 56, bgColor: "primary" }}><AppShortcutIcon /></Avatar>}
-                            titleTypographyProps={{ variant: 'h6' }} />
-                        <CardContent>
-                            View and
                         </CardContent>
-                        <CardActions>
-                            <Button size="small">Manage Connections</Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                        <CardActions >
+                            {!profile && <Box sx={{ pt: 37 }}><Button>Get Registered</Button> </Box>}
 
+                        </CardActions>
+
+                    </Card>
+
+                </Grid>
 
                 <Grid item xs={12} md={12} zeroMinWidth >
-                    <Card sx={{ height: '100%', maxWidth: '100%' }}>
+                    <Card sx={{ height: '100%' }}>
+                        <CardHeader
+                            title="All accounts"
+
+                            avatar={<Avatar sx={{ bgcolor: 'red' }}><ManageAccountsOutlinedIcon /></Avatar>}
+                            titleTypographyProps={{ variant: 'h6' }} />
                         <CardContent>
-                            <pre>
-                                {JSON.stringify(identity, null, 4)}
-                            </pre>
+                            <AccountsListDashBoard />
                         </CardContent>
+
                     </Card>
                 </Grid>
+
+
+
+
             </Grid>
         </Container>
 
