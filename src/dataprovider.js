@@ -33,7 +33,7 @@ import { fetchUtils, DataProvider } from 'ra-core';
  *
  * export default App;
  */
-var dataprovider = (apiUrl, httpClient = fetchUtils.fetchJson): DataProvider => ({
+var dataprovider = (apiUrl, httpClient = fetchUtils.fetchJson)=> ({
     getList: (resource, params) => {
         const { page, perPage } = params.pagination;
         const { field, order } = params.sort;
@@ -59,10 +59,24 @@ var dataprovider = (apiUrl, httpClient = fetchUtils.fetchJson): DataProvider => 
         });
     },
 
-    getOne: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
-            data: json,
-        })),
+    getOne: (resource, params) =>{
+        if(resource==='profile'){
+            console.log(`sadasdsaddasd ${apiUrl}/profile`);
+            return httpClient(`${apiUrl}/profile`).then(({ json }) => ({
+                data: json,
+            }))
+        }else if(resource==='editableCredentials'){
+            return httpClient(`${apiUrl}/profile`).then(({ json }) => ({
+                data: json,
+            }))
+        }else{
+            return httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
+                data: json,
+            }))
+
+        }
+    }
+        ,
 
     getMany: (resource, params) => {
         const query = {
@@ -101,11 +115,26 @@ var dataprovider = (apiUrl, httpClient = fetchUtils.fetchJson): DataProvider => 
         });
     },
 
-    update: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(params.data),
-        }).then(({ json }) => ({ data: json })),
+    update: (resource, params) =>{
+        if(resource==='editableCredentials'){
+            return httpClient(`${apiUrl}/accounts/${params.id}/edit`, {
+                method: 'PUT',
+                body: JSON.stringify(params.data),
+            }).then(({ json }) => ({ data: json }))
+        }else if(resource==='editableAccounts'){
+            return httpClient(`${apiUrl}/accounts/${params.id}/edit`, {
+                method: 'PUT',
+                body: JSON.stringify(params.data),
+            }).then(({ json }) => ({ data: json }))
+        }else{
+            return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(params.data),
+            }).then(({ json }) => ({ data: json }))
+        }
+
+    }
+        ,
 
     // json-server doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
     updateMany: (resource, params) =>
@@ -126,10 +155,18 @@ var dataprovider = (apiUrl, httpClient = fetchUtils.fetchJson): DataProvider => 
             data: { ...params.data, id: json.id },
         })),
 
-    delete: (resource, params) =>
-        httpClient(`${apiUrl}/${resource}/${params.id}`, {
-            method: 'DELETE',
-        }).then(({ json }) => ({ data: json })),
+    delete: (resource, params) =>{
+        if(resource==='deleteAccount'){
+            return httpClient(`${apiUrl}/accounts/${params.id}`, {
+                method: 'DELETE',
+                body: JSON.stringify(params.data),
+            }).then(({ json }) => ({ data: json }))
+        }else{
+            return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+                method: 'DELETE',
+            }).then(({ json }) => ({ data: json }))
+        }
+    },
 
     // json-server doesn't handle filters on DELETE route, so we fallback to calling DELETE n times instead
     deleteMany: (resource, params) =>

@@ -1,54 +1,66 @@
 import * as React from "react";
-import { Admin, Resource, ListGuesser } from 'react-admin';
-import { List, Datagrid, SingleFieldList, SimpleList } from "react-admin";
+import { Admin, Resource, useTranslate, EditGuesser, ShowGuesser } from "react-admin";
+import { List, Datagrid,  } from "react-admin";
 import { Show, SimpleShowLayout } from "react-admin";
 
-import { ArrayField, TextField, ChipField, RichTextField, ReferenceField, ReferenceArrayField } from "react-admin";
-import { Container, Box, Grid, Paper, Typography, Button } from '@mui/material';
+import {
+  TextField,
+  RichTextField,
+} from "react-admin";
 
-import PersonIcon from '@mui/icons-material/Person';
-import AppShortcutIcon from '@mui/icons-material/AppShortcut';
 
-import { fetchUtils } from 'react-admin'
+import { fetchUtils } from "react-admin";
 import radataprovider from "./dataprovider";
 import raauthprovider from "./authProvider";
 
-import { defaultTheme } from 'react-admin';
-import MyLayout from './layout'
-import { AccountList } from "./accounts";
+import { defaultTheme } from "react-admin";
+import MyLayout from "./layout";
+import { AccountEdit, AccountList } from "./pages/accounts";
+import { ConnectionList } from "./pages/connections";
+import i18nProvider from './i18nProvider';
 
-import dashboard from "./dashboard";
+import dashboard from "./pages/dashboard";
+import GroupIcon from '@mui/icons-material/Group';
+import CableIcon from '@mui/icons-material/Cable';
+import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
+import { LogoutPage } from "./pages/logout";
+import { CredentialList, CredentialsEdit } from "./pages/credentials";
 
 function fetchJson(url, options = {}) {
   if (!options.headers) {
-    options.headers = new Headers({ Accept: 'application/json' })
+    options.headers = new Headers({ Accept: "application/json" });
   }
 
-  options.credentials = 'include'
+  options.credentials = "include";
 
-  return fetchUtils.fetchJson(url, options)
+  return fetchUtils.fetchJson(url, options);
 }
 
-const dataProvider = radataprovider('http://localhost:9090/console/user', fetchJson);
-const authProvider = raauthprovider('http://localhost:9090/console/user', fetchJson);
-
+const dataProvider = radataprovider(
+  "http://localhost:8080/console/user",
+  fetchJson
+);
+const authProvider = raauthprovider(
+  "http://localhost:8080/console/user",
+  fetchJson
+);
 
 const myTheme = {
   ...defaultTheme,
   palette: {
     primary: {
-      main: '#0066cc',
-      dark: '#00478e',
-      light: '#3384d6'
+      main: "#0066cc",
+      dark: "#00478e",
+      light: "#3384d6",
     },
     secondary: {
-      main: '#b2b2b2',
-      dark: '#7c7c7c',
-      light: '#c1c1c1'
+      main: "#b2b2b2",
+      dark: "#7c7c7c",
+      light: "#c1c1c1",
     },
   },
   typography: {
-    fontFamily: ['"Titillium Web"', 'Geneva', 'Tahoma', 'sans-serif'].join(','),
+    fontFamily: ['"Titillium Web"', "Geneva", "Tahoma", "sans-serif"].join(","),
     h1: {
       fontWeight: 700,
     },
@@ -74,44 +86,12 @@ const myTheme = {
         // Name of the slot
         root: {
           fontWeight: 700,
-          fontSize: '.92rem',
+          fontSize: ".92rem",
         },
       },
     },
   },
 };
-
-
-export const ConnectionList = () => (
-  <List>
-    <SimpleList
-      primaryText={record => record.appName}
-      secondaryText={record => record.realm}
-      tertiaryText={
-        // <ReferenceArrayField source="scopes" reference="scopes">
-        //   <SingleFieldList>
-        //     <TextField source="name" />
-        //   </SingleFieldList>
-        // </ReferenceArrayField>
-        <ArrayField source="scopes">
-          <SimpleList
-            primaryText={record => record.name}
-            secondaryText={record => record.description}
-          />
-        </ArrayField>
-      }
-      leftIcon={record => <AppShortcutIcon />}
-    />
-    {/* <Datagrid>
-        <TextField source="id" />
-        <ReferenceField source="subjectId" reference="subjects"><TextField source="id" /></ReferenceField>
-        <ReferenceField source="clientId" reference="clients"><TextField source="id" /></ReferenceField>
-        <TextField source="realm" />
-        <TextField source="appName" />
-        <ArrayField source="scopes"><SingleFieldList><ChipField source="scope" /></SingleFieldList></ArrayField>
-      </Datagrid> */}
-  </List>
-);
 
 export const ScopeList = () => (
   <List>
@@ -136,14 +116,26 @@ export const ScopeShow = () => (
   </Show>
 );
 
-const App = () => (
-  <Container maxWidth="xl">
-    <Admin title="AAC" disableTelemetry authProvider={authProvider} dataProvider={dataProvider} theme={myTheme} dashboard={dashboard} layout={MyLayout}>
-      <Resource name="accounts" list={AccountList} />
-      <Resource name="connections" list={ConnectionList} />
-      {/* <Resource name="scopes" list={ScopeList} show={ScopeShow} /> */}
+const App = () => {
+  const translate = useTranslate();
+  return <Admin
+    title='ACC'
+    disableTelemetry
+    authProvider={authProvider}
+    dataProvider={dataProvider}
+    i18nProvider={i18nProvider}
+    loginPage={LogoutPage}
+    theme={myTheme}
+    dashboard={dashboard}
+    layout={MyLayout}
+  >
+    <Resource name='accounts' icon={GroupIcon} list={AccountList} edit={AccountEdit} />
+    <Resource name='credentials' icon={GroupIcon} list={CredentialList} edit={CredentialsEdit}/>
+    <Resource name='scopes' icon={CenterFocusWeakIcon} list={ScopeList} show={ScopeShow}/>
+    <Resource name='connections' icon={CableIcon} list={ConnectionList} show={ShowGuesser} edit={EditGuesser}/>
+    <Resource name='details'/>
+    <Resource name='logout' show={LogoutPage}/>
 
-    </Admin>
-  </Container>
-);
+  </Admin>
+};
 export default App;

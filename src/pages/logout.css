@@ -1,0 +1,27 @@
+.Box {
+    border-radius: 5px;
+    border: 2px blue solid;
+    padding: 1%;
+}
+
+.Margin-top{
+    margin-top: 1%;
+}
+
+.BottomBox{
+    border-bottom: 1px grey solid;
+}
+
+.Center-element{
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+
+.CenterText {
+    justify-content: center;
+}
+
+.Full-width{
+    width: 100%;
+}
